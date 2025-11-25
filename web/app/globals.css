@@ -1,26 +1,260 @@
 @import "tailwindcss";
 
+/* ========================================
+   TETHOS - Global Styles (Cleaned)
+   ======================================== */
+
+/* Remove conflicting default vars and use tokens.css instead */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* These come from tokens.css - no need to redefine */
+  font-family: var(--font-body);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-bg-main); /* Use token instead of hardcode */
+  color: var(--color-text-main);
+  font-family: var(--font-body);
+  cursor: none !important;
+}
+
+/* Hide default cursor on all interactive elements */
+button,
+a,
+[role="button"],
+input,
+select,
+textarea {
+  cursor: none !important;
+}
+
+/* Utility class for headings */
+.font-heading {
+  font-family: var(--font-heading);
+}
+
+/* ========================================
+   Glass Card Component
+   ======================================== */
+
+.glass-card {
+  width: 240px;
+  height: 360px;
+  position: relative;
+  overflow: hidden;
+
+  /* Glass body */
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(26px) saturate(1.35);
+  -webkit-backdrop-filter: blur(26px) saturate(1.35);
+
+  /* Rounded corners */
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+
+  /* Depth shadows */
+  box-shadow:
+    0 18px 45px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.60),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.18),
+    inset 0 0 30px rgba(255, 255, 255, 0.06);
+}
+
+/* Top specular highlight */
+.glass-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.85) 40%,
+    rgba(255, 255, 255, 0.4) 60%,
+    transparent 100%
+  );
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+/* Vertical edge light */
+.glass-card::after {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 0;
+  width: 1px;
+  height: calc(100% - 16px);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.7) 0%,
+    rgba(255, 255, 255, 0.15) 40%,
+    rgba(255, 255, 255, 0.4) 100%
+  );
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+/* ========================================
+   Scroll Indicator Animation
+   ======================================== */
+
+:root {
+  --color-bg-mouse: #0F0F10;
+  --color-outline: #ffffff;
+  --color-outline-fade: #4e5559;
+  --width-mouse: 26px;
+  --height-mouse: 44px;
+  --border-mouse: 3px;
+  --pos-mouse: 4px;
+  --pos-text: 1px;
+  --size-trackball: 5px;
+  --pos-trackball: 10px;
+  --shrink-trackball: 0.4;
+  --anim-duration: 5s;
+}
+
+.mouse {
+  background: var(--color-outline-fade)
+    linear-gradient(
+      transparent 0%,
+      transparent 50%,
+      var(--color-outline) 50%,
+      var(--color-outline) 100%
+    );
+  position: relative;
+  width: var(--width-mouse);
+  height: var(--height-mouse);
+  border-radius: 100px;
+  background-size: 100% 200%;
+  animation: 
+    colorSlide var(--anim-duration) linear infinite,
+    nudgeMouse var(--anim-duration) ease-out infinite;
+}
+
+.mouse::before,
+.mouse::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  margin: auto;
+}
+
+.mouse::before {
+  width: calc(var(--width-mouse) - var(--border-mouse));
+  height: calc(var(--height-mouse) - var(--border-mouse));
+  background-color: var(--color-bg-mouse);
+  border-radius: 100px;
+}
+
+.mouse::after {
+  background-color: var(--color-outline);
+  width: var(--size-trackball);
+  height: var(--size-trackball);
+  border-radius: 100%;
+  animation: trackBallSlide var(--anim-duration) linear infinite;
+}
+
+@keyframes colorSlide {
+  0% { background-position: 0% 100%; }
+  20% { background-position: 0% 0%; }
+  21% { background-color: var(--color-outline-fade); }
+  29.99% {
+    background-color: var(--color-outline);
+    background-position: 0% 0%;
+  }
+  30% {
+    background-color: var(--color-outline-fade);
+    background-position: 0% 100%;
+  }
+  50% { background-position: 0% 0%; }
+  51% { background-color: var(--color-outline-fade); }
+  59% {
+    background-color: var(--color-outline);
+    background-position: 0% 0%;
+  }
+  60% {
+    background-color: var(--color-outline-fade);
+    background-position: 0% 100%;
+  }
+  80% { background-position: 0% 0%; }
+  81% { background-color: var(--color-outline-fade); }
+  90%, 100% { background-color: var(--color-outline); }
+}
+
+@keyframes trackBallSlide {
+  0% {
+    opacity: 1;
+    transform: scale(1) translateY(calc(-1 * var(--pos-trackball)));
+  }
+  6% {
+    opacity: 1;
+    transform: scale(0.9) translateY(calc(var(--pos-trackball) / 4));
+  }
+  14% {
+    opacity: 0;
+    transform: scale(var(--shrink-trackball)) translateY(calc(var(--pos-trackball) * 2));
+  }
+  15%, 19% {
+    opacity: 0;
+    transform: scale(var(--shrink-trackball)) translateY(calc(-1 * var(--pos-trackball)));
+  }
+  28%, 29.99% {
+    opacity: 1;
+    transform: scale(1) translateY(calc(-1 * var(--pos-trackball)));
+  }
+  30% {
+    opacity: 1;
+    transform: scale(1) translateY(calc(-1 * var(--pos-trackball)));
+  }
+  36% {
+    opacity: 1;
+    transform: scale(0.9) translateY(calc(var(--pos-trackball) / 4));
+  }
+  44% {
+    opacity: 0;
+    transform: scale(var(--shrink-trackball)) translateY(calc(var(--pos-trackball) * 2));
+  }
+  45%, 49% {
+    opacity: 0;
+    transform: scale(var(--shrink-trackball)) translateY(calc(-1 * var(--pos-trackball)));
+  }
+  58%, 59.99% {
+    opacity: 1;
+    transform: scale(1) translateY(calc(-1 * var(--pos-trackball)));
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1) translateY(calc(-1 * var(--pos-trackball)));
+  }
+  66% {
+    opacity: 1;
+    transform: scale(0.9) translateY(calc(var(--pos-trackball) / 4));
+  }
+  74% {
+    opacity: 0;
+    transform: scale(var(--shrink-trackball)) translateY(calc(var(--pos-trackball) * 2));
+  }
+  75%, 79% {
+    opacity: 0;
+    transform: scale(var(--shrink-trackball)) translateY(calc(-1 * var(--pos-trackball)));
+  }
+  88%, 100% {
+    opacity: 1;
+    transform: scale(1) translateY(calc(-1 * var(--pos-trackball)));
+  }
+}
+
+@keyframes nudgeMouse {
+  0% { transform: translateY(0); }
+  20% { transform: translateY(var(--pos-mouse)); }
+  30% { transform: translateY(0); }
+  50% { transform: translateY(var(--pos-mouse)); }
+  60% { transform: translateY(0); }
+  80% { transform: translateY(var(--pos-mouse)); }
+  90% { transform: translateY(0); }
 }

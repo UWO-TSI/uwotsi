@@ -1,0 +1,160 @@
+/* ===========================
+   TETHOS – Design Tokens
+   Used via CSS variables + Tailwind
+   =========================== */
+
+   :root {
+    /* ========= COLORS ========= */
+  
+    /* Core background + surface */
+    --color-bg-main: #0f0f10;      /* page background */
+    --color-bg-alt: #111113;       /* alternating sections */
+    --color-bg-navy: #0d1b2a;      /* accent sections / strips */
+  
+    /* Surfaces / cards */
+    --color-surface: #111827;
+    --color-surface-soft: #18181b;
+  
+    /* Brand */
+    --color-brand-blue: #002fa7;
+    --color-brand-yellow: #ffd166;
+    --color-brand-light: #f1ffff;
+  
+    /* Accents */
+    --color-accent-cyan: #22d3ee;
+    --color-accent-purple: #a855f7;
+  
+    /* Text */
+    --color-text-main: #f1ffff;
+    --color-text-soft: #e5e7eb;
+    --color-text-muted: #9ca3af;
+    --color-text-subtle: #6b7280;
+  
+    /* Greyscale (general UI) */
+    --gray-50:  #f9fafb;
+    --gray-100: #f4f4f5;
+    --gray-200: #e4e4e7;
+    --gray-300: #d4d4d8;
+    --gray-400: #a1a1aa;
+    --gray-500: #71717a;
+    --gray-600: #52525b;
+    --gray-700: #3f3f46;
+    --gray-800: #27272a;
+    --gray-900: #18181b;
+  
+    /* Semantic */
+    --color-success: #22c55e;
+    --color-error: #ef4444;
+    --color-warning: #facc15;
+  
+    /* Glass / overlays */
+    --glass-bg-hero: rgba(15, 15, 16, 0.55);
+    --glass-bg-pill: rgba(15, 15, 16, 0.78);
+    --glass-border-soft: rgba(241, 255, 255, 0.12);
+    --glass-border-strong: rgba(255, 255, 255, 0.18);
+  
+    /* Glows */
+    --glow-blue: rgba(0, 47, 167, 0.5);
+    --glow-cyan: rgba(34, 211, 238, 0.5);
+    --glow-gold: rgba(255, 209, 102, 0.25);
+  
+    /* ========= TYPOGRAPHY ========= */
+  
+    /* NOTE: --font-heading and --font-body are set by Next.js in layout.tsx
+       via next/font/google. Do NOT redefine them here. */
+  
+    /* Font sizes (desktop base) */
+    --font-size-hero: 4rem;        /* 64px */
+    --font-size-h1: 3rem;          /* 48px */
+    --font-size-h2: 2.25rem;       /* 36px */
+    --font-size-h3: 1.875rem;      /* 30px */
+    --font-size-h4: 1.5rem;        /* 24px */
+    --font-size-body-lg: 1.125rem; /* 18px */
+    --font-size-body: 1rem;        /* 16px */
+    --font-size-body-sm: 0.875rem; /* 14px */
+    --font-size-label: 0.75rem;    /* 12px */
+  
+    /* Line heights */
+    --lh-tight: 1.1;
+    --lh-snug: 1.25;
+    --lh-normal: 1.5;
+    --lh-relaxed: 1.6;
+  
+    /* ========= SPACING ========= */
+  
+    --space-1: 0.25rem;  /* 4px */
+    --space-2: 0.5rem;   /* 8px */
+    --space-3: 0.75rem;  /* 12px */
+    --space-4: 1rem;     /* 16px */
+    --space-6: 1.5rem;   /* 24px */
+    --space-8: 2rem;     /* 32px */
+    --space-12: 3rem;    /* 48px */
+    --space-16: 4rem;    /* 64px */
+    --space-24: 6rem;    /* 96px */
+  
+    /* ========= RADII ========= */
+  
+    --radius-sm: 0.5rem;     /* 8px */
+    --radius-md: 1rem;       /* 16px */
+    --radius-lg: 1.5rem;     /* 24px */
+    --radius-xl: 2rem;       /* 32px */
+    --radius-pill: 9999px;   /* pill */
+  
+    /* ========= SHADOWS ========= */
+  
+    --shadow-soft: 0 12px 30px rgba(0, 0, 0, 0.35);
+    --shadow-strong: 0 18px 45px rgba(0, 0, 0, 0.6);
+  
+    --shadow-glass:
+      0 18px 45px rgba(0, 0, 0, 0.18),
+      inset 0 1px 0 rgba(255, 255, 255, 0.6),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.18),
+      inset 0 0 30px rgba(255, 255, 255, 0.06);
+  }
+  
+  /* Example helper classes if you want them (optional) */
+  
+  .glass-card {
+    position: relative;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(26px) saturate(1.35);
+    -webkit-backdrop-filter: blur(26px) saturate(1.35);
+    border-radius: 22px;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    box-shadow: var(--shadow-glass);
+  }
+  
+  .glass-card::before {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    top: 0;
+    height: 2px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.85) 40%,
+      rgba(255, 255, 255, 0.4) 60%,
+      transparent 100%
+    );
+    opacity: 0.8;
+    pointer-events: none;
+  }
+  
+  .glass-card::after {
+    content: "";
+    position: absolute;
+    top: 8px;
+    left: 0;
+    width: 1px;
+    height: calc(100% - 16px);
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.7) 0%,
+      rgba(255, 255, 255, 0.15) 40%,
+      rgba(255, 255, 255, 0.4) 100%
+    );
+    opacity: 0.9;
+    pointer-events: none;
+  }
