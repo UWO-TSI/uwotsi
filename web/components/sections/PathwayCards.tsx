@@ -42,14 +42,19 @@ const cards: PathwayCard[] = [
 // BALATRO-INSPIRED CARD HAND CALCULATIONS
 // ============================================
 
-const CARD_SPACING = 0.85; // Natural spacing with slight corner overlap
-const SMALL_LIFT = 12;
-const MAX_FAN_ANGLE = 15;
+const CARD_WIDTH = 330; // 11 units
+const CARD_HEIGHT = 570; // 19 units (11:19 ratio)
+const CARD_SPACING = 0.75; // Closer spacing for overlap (75% of card width)
+const SMALL_LIFT = 30; // Natural arc - outer cards lift UP
+const MAX_FAN_ANGLE = 18; // Fan rotation angle
 
 function getCardTransform(index: number, totalCards: number) {
   const t = index - (totalCards - 1) / 2;
-  const xOffset = t * (280 * CARD_SPACING); // 280px = card width
-  const yOffset = -Math.abs(t) * SMALL_LIFT;
+  const xOffset = t * (CARD_WIDTH * CARD_SPACING);
+  
+  // Natural arc: outer cards are HIGHER (positive y = up)
+  const yOffset = Math.abs(t) * SMALL_LIFT;
+  
   const rotation = totalCards > 1 
     ? (t * MAX_FAN_ANGLE) / ((totalCards - 1) / 2)
     : 0;
@@ -66,6 +71,9 @@ function Card3D({ card, index, totalCards }: { card: PathwayCard; index: number;
   const [isHovered, setIsHovered] = useState(false);
   const breathingTween = useRef<gsap.core.Tween | null>(null);
   
+  // Separate breathing scale from hover scale
+  const breathingScale = useMotionValue(1);
+  
   // Mouse position relative to card center
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -80,35 +88,49 @@ function Card3D({ card, index, totalCards }: { card: PathwayCard; index: number;
     damping: 20,
   });
   
-  // Setup breathing animation
+  const { xOffset, yOffset, rotation } = getCardTransform(index, totalCards);
+  
+  // Combine breathing scale with hover scale
+  const combinedScale = useTransform(
+    breathingScale,
+    (breathing) => (isHovered ? 1.15 : 1) * breathing
+  );
+  
+  // Setup breathing animation using MotionValue
   useEffect(() => {
-    if (!cardRef.current) return;
+    // Create a simple object to animate
+    const breathingObject = { value: 1 };
     
-    breathingTween.current = gsap.to(cardRef.current, {
-      scale: 0.9994, // Even more subtle: 0.06% scale change (was 0.9992)
-      duration: 5,
+    breathingTween.current = gsap.to(breathingObject, {
+      value: 1.02, // 2% scale change - more visible breathing
+      duration: 3.5, // Slightly faster for better visibility
       repeat: -1,
       yoyo: true,
       ease: "sine.inOut",
-      delay: Math.random() * 3,
-      paused: false,
+      delay: Math.random() * 2,
+      onUpdate: () => {
+        breathingScale.set(breathingObject.value);
+      },
     });
     
     return () => {
       breathingTween.current?.kill();
     };
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty deps - only run once on mount
   
-  // Pause breathing on hover
+  // Pause breathing on hover, resume on leave
   useEffect(() => {
     if (isHovered) {
       breathingTween.current?.pause();
-      // Reset to scale 1
-      gsap.to(cardRef.current, { scale: 1, duration: 0.2 });
+      breathingScale.set(1); // Reset to 1 when hovering
     } else {
-      breathingTween.current?.resume();
+      // Small delay before resuming breathing
+      setTimeout(() => {
+        breathingTween.current?.resume();
+      }, 300);
     }
-  }, [isHovered]);
+  }, [isHovered]); // Only depend on isHovered
   
   // Handle mouse move for 3D tilt effect
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -132,27 +154,27 @@ function Card3D({ card, index, totalCards }: { card: PathwayCard; index: number;
     mouseY.set(0);
   };
   
-  const { xOffset, yOffset, rotation } = getCardTransform(index, totalCards);
-  
   return (
     <motion.div
       ref={cardRef}
-      className="pathway-card absolute w-[280px] h-[360px] cursor-pointer opacity-0"
+      className="pathway-card absolute cursor-pointer opacity-0"
+      style={{
+        width: CARD_WIDTH,
+        height: CARD_HEIGHT,
+        x: xOffset, // Static horizontal position
+        scale: combinedScale, // Breathing + hover scale combined
+        transformOrigin: "center bottom",
+        transformStyle: "preserve-3d",
+        perspective: 1000,
+        zIndex: isHovered ? 50 : index,
+      }}
       initial={{
         y: 150,
         scale: 0.8,
       }}
       animate={{
-        y: isHovered ? yOffset - 50 : yOffset,
-        scale: isHovered ? 1.15 : 1,
+        y: isHovered ? yOffset - 60 : yOffset,
         rotate: isHovered ? rotation * 0.9 : rotation,
-      }}
-      style={{
-        x: xOffset, // Static horizontal position
-        transformOrigin: "center bottom",
-        transformStyle: "preserve-3d",
-        perspective: 1000,
-        zIndex: isHovered ? 50 : index,
       }}
       transition={{
         type: "spring",
@@ -248,28 +270,20 @@ export default function PathwayCards() {
         0
       );
 
-      // 2. Animate cards up one by one
+      // 2. Animate cards up one by one (ONLY opacity)
       const cardElements = cardsContainerRef.current?.querySelectorAll(".pathway-card");
       if (cardElements) {
         cardElements.forEach((card, index) => {
           const startTime = 0.2 + (index * 0.12);
-          const { xOffset, yOffset, rotation } = getCardTransform(index, cards.length);
           
+          // Only animate opacity - Framer Motion handles position
           mainTimeline.fromTo(
             card,
             {
               opacity: 0,
-              y: 150,
-              x: 0,
-              rotation: 0,
-              scale: 0.8,
             },
             {
               opacity: 1,
-              y: yOffset,
-              x: xOffset,
-              rotation: rotation,
-              scale: 1,
               duration: 0.15,
               ease: "back.out(1.2)",
             },
@@ -287,10 +301,19 @@ export default function PathwayCards() {
       );
       
       // Note: Breathing animation is now handled in Card3D component
+      // Note: Card positioning is handled by Framer Motion in Card3D
 
     }, sectionRef);
 
-    return () => ctx.revert();
+    // Refresh ScrollTrigger after initial render
+    const refreshTimer = setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 100);
+
+    return () => {
+      ctx.revert();
+      clearTimeout(refreshTimer);
+    };
   }, []);
 
   return (
@@ -308,7 +331,7 @@ export default function PathwayCards() {
         </h2>
 
         {/* Cards Container */}
-        <div ref={cardsContainerRef} className="relative w-full max-w-6xl mx-auto h-[400px]">
+        <div ref={cardsContainerRef} className="relative w-full max-w-7xl mx-auto h-[600px]">
           {/* Desktop: Fanned card hand */}
           <div className="hidden md:block relative w-full h-full">
             <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex items-end justify-center">

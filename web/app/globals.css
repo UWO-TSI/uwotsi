@@ -27,6 +27,12 @@ textarea {
   cursor: none !important;
 }
 
+/* Override cursor-pointer class to still hide cursor */
+.cursor-pointer,
+*[class*="cursor-pointer"] {
+  cursor: none !important;
+}
+
 /* Utility class for headings */
 .font-heading {
   font-family: var(--font-heading);

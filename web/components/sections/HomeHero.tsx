@@ -23,36 +23,52 @@ export default function HomeHero() {
         delay: 0.3,
       });
 
-      // Create a timeline for the fade out effect
-      // Pin the section while fading content from 1 to 0
+      // Pin section and fade out gradually over scroll distance
       const timeline = gsap.timeline({
         scrollTrigger: {
           trigger: sectionRef.current,
           start: "top top",
-          end: "+=150%", // Pin for 1.5 viewport heights (adjust for slower/faster fade)
-          scrub: 1, // Smooth scrubbing (1 = slight lag for smoothness)
+          end: "+=100%", // Pin for 1 full viewport height of scrolling
+          scrub: 1,
           pin: true,
-          pinSpacing: true, // Maintain spacing so next section waits
+          pinSpacing: true,
           anticipatePin: 1,
+          invalidateOnRefresh: true,
+          markers: false, // Set to true for debugging
         },
       });
 
-      // Fade out content
+      // Fade out content - but only in the SECOND HALF of the scroll
       timeline.to(contentRef.current, {
         opacity: 0,
         ease: "power2.inOut",
-        duration: 1,
-      });
+      }, 0.5); // Start fade at 50% of timeline (halfway through scroll)
 
     }, sectionRef);
 
-    return () => ctx.revert();
+    // Refresh ScrollTrigger after fonts/images load
+    const refreshTimer = setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 100);
+
+    // Also refresh on window load (catches late-loading assets)
+    const handleLoad = () => {
+      ScrollTrigger.refresh();
+    };
+    
+    window.addEventListener('load', handleLoad);
+
+    return () => {
+      ctx.revert();
+      clearTimeout(refreshTimer);
+      window.removeEventListener('load', handleLoad);
+    };
   }, []);
 
   return (
     <section
       ref={sectionRef}
-      className="h-screen flex items-center justify-center relative bg-[#0F0F10]"
+      className="min-h-screen flex items-center justify-center relative bg-[#0F0F10] pt-[96px]"
     >
       <div
         ref={contentRef}
