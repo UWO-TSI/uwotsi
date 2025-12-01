@@ -59,14 +59,14 @@ export default function NPOHomePage() {
 	  >
 				{/* Two-column layout: left 67% (stacked top + bottom split), right 40% (pink image placeholder) */}
 				<div className="w-full flex items-start justify-center py-2">
-					<div className="w-[95%] max-w-[100vw] flex gap-8 items-stretch">
+					<div className="w-[95%] max-w-[100vw] flex items-stretch">
 						{/* Left column (67%) */}
 						<div className="w-[67%] flex flex-col gap-6" style={{ fontFamily: 'Inter, var(--font-body), system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
 							{/* Top Paragraph*/}
 							<div className="bg-[#0F0F10] rounded-md pl-6 pt-4 flex items-start justify-start min-h-[24vh]">
 								<div className="text-[#F1FFFF] text-left">
 									<h2 className="text-6xl mb-4">Our Nonprofit Program</h2>
-									<p className="text-2xl mb-4 text-[#A1A1AA] leading-relaxed">A 8 month pro-bono Initiative Supporting nonprofits with custom technical solutions</p>
+									<p className="text-2xl mb-4 text-[#A1A1AA] leading-relaxed">A 8 month pro-bono Initiative supporting nonprofits <br/> with custom technical Solutions</p>
 									<p className="text-2xl pt-4 pb-4 mb-4 text-[#A1A1AA] leading-relaxed">Designed specifically for registered nonprofit organizations</p>
 								</div>
 							</div>
@@ -80,7 +80,7 @@ export default function NPOHomePage() {
 									<h3 className="text-white text-2xl font-bold mb-2">1500+</h3>
 									<h3 className="text-white text-2xl font-bold mb-2">$200,000+</h3>
 								</div>
-								<div className="flex-1 p-4 bg-transparent flex flex-col justify-center items-start">
+								<div className="flex-1 p-4 bg-transparent flex flex-col justify-center items-start" style={{ fontFamily: 'var(--font-heading), Space Grotesk, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
 									<h3 className="text-white text-2xl font-medium mb-2">Projects</h3>
 									<h3 className="text-white text-2xl font-medium mb-2">Alum & members</h3>
 									<h3 className="text-white text-2xl font-medium mb-2">Community</h3>
