@@ -157,7 +157,7 @@ function Card3D({ card, index, totalCards }: { card: PathwayCard; index: number;
   return (
     <motion.div
       ref={cardRef}
-      className="pathway-card absolute cursor-pointer opacity-0"
+      className="pathway-card absolute opacity-0"
       style={{
         width: CARD_WIDTH,
         height: CARD_HEIGHT,
@@ -167,6 +167,7 @@ function Card3D({ card, index, totalCards }: { card: PathwayCard; index: number;
         transformStyle: "preserve-3d",
         perspective: 1000,
         zIndex: isHovered ? 50 : index,
+        pointerEvents: "none", // Disable pointer events on container
       }}
       initial={{
         y: 150,
@@ -182,12 +183,6 @@ function Card3D({ card, index, totalCards }: { card: PathwayCard; index: number;
         damping: 25,
         mass: 0.5,
       }}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={handleMouseLeave}
-      whileTap={{
-        scale: 1.05,
-      }}
     >
       {/* 3D Card Inner Container */}
       <motion.div
@@ -198,6 +193,17 @@ function Card3D({ card, index, totalCards }: { card: PathwayCard; index: number;
           transformStyle: "preserve-3d",
         }}
       >
+        {/* Precise Hitbox - matches card shape exactly and follows 3D transforms */}
+        <div
+          className="absolute inset-0 cursor-pointer"
+          style={{
+            borderRadius: "22px", // Match glass-card border-radius
+            pointerEvents: "auto", // Enable pointer events only on hitbox
+          }}
+          onMouseMove={handleMouseMove}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={handleMouseLeave}
+        />
         {/* Shine overlay effect (appears on hover) */}
         <motion.div
           className="absolute inset-0 rounded-[22px] pointer-events-none"
@@ -212,7 +218,7 @@ function Card3D({ card, index, totalCards }: { card: PathwayCard; index: number;
         />
         
         {/* Card Content */}
-        <div className="relative z-10">
+        <div className="relative z-10 pointer-events-none">
           <h3 className="font-heading text-2xl font-semibold mb-3">
             {card.title}
           </h3>
