@@ -1,9 +1,11 @@
 import CompaniesHero from "./CompaniesHero";
+import CompaniesBuild from "./CompaniesBuild";
 
 export default function CompaniesPage() {
   return (
-    <main>
+    <>
       <CompaniesHero />
-    </main>
+      <CompaniesBuild />
+    </>
   );
 }
