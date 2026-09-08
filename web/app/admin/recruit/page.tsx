@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useState, useCallback, useMemo } from "react";
-import { useRouter } from "next/navigation";
 import FilterBar, { type FilterState } from "@/components/admin/FilterBar";
 import ApplicantCard from "@/components/admin/ApplicantCard";
 import ReleaseControls from "@/components/admin/ReleaseControls";
 import RecruitInsights from "@/components/admin/RecruitInsights";
 import RecruitBoard from "@/components/admin/RecruitBoard";
 import ArchivePanel from "@/components/admin/ArchivePanel";
+import AuthModal from "@/components/recruit/AuthModal";
 import { motion } from "framer-motion";
 import { fadeUpVariants } from "@/lib/motion";
 import { RefreshCw, Download } from "lucide-react";
@@ -21,8 +21,10 @@ import {
 import type { User } from "@supabase/supabase-js";
 
 export default function AdminRecruitPage() {
-  const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
+  // Signed in, but the email is not on the admin whitelist.
+  const [denied, setDenied] = useState(false);
+  const [showAuth, setShowAuth] = useState(false);
   const [applications, setApplications] = useState<Application[]>([]);
   const [positions, setPositions] = useState<Position[]>([]);
   const [loading, setLoading] = useState(true);
@@ -54,8 +56,16 @@ export default function AdminRecruitPage() {
       headers: { "Content-Type": "application/json" },
     });
 
+    // 401: the server has no session for this browser (stale cookie).
+    // 403: signed in, but not an admin. Say so instead of bouncing home.
+    if (res.status === 401) {
+      setUser(null);
+      setLoading(false);
+      return;
+    }
     if (res.status === 403) {
-      router.push("/");
+      setDenied(true);
+      setLoading(false);
       return;
     }
 
@@ -72,7 +82,7 @@ export default function AdminRecruitPage() {
     }
 
     setLoading(false);
-  }, [supabase, router]);
+  }, [supabase]);
 
   useEffect(() => {
     fetchData();
@@ -260,8 +270,60 @@ export default function AdminRecruitPage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-[#9CA3AF]">Please sign in to access admin.</p>
+      <div className="min-h-screen flex items-center justify-center px-6">
+        <div className="text-center max-w-sm">
+          <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#1D9BF0] mb-3">
+            Admin
+          </p>
+          <p className="text-[#F1FFFF] text-lg font-semibold mb-2">
+            Sign in to open the applications board
+          </p>
+          <p className="text-sm text-[#9CA3AF] mb-6">
+            Use the email that is on the admin list.
+          </p>
+          <button
+            type="button"
+            onClick={() => setShowAuth(true)}
+            className="rounded-full bg-[#1D9BF0] hover:bg-[#1a8cd8] text-white px-6 py-2.5 text-sm font-medium transition"
+          >
+            Sign in
+          </button>
+        </div>
+        <AuthModal
+          isOpen={showAuth}
+          onClose={() => setShowAuth(false)}
+          redirectTo="/admin/recruit"
+        />
+      </div>
+    );
+  }
+  if (denied) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-6">
+        <div className="text-center max-w-md">
+          <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#EF4444] mb-3">
+            Not an admin
+          </p>
+          <p className="text-[#F1FFFF] text-lg font-semibold mb-2">
+            Signed in as {user.email}
+          </p>
+          <p className="text-sm text-[#9CA3AF] mb-6">
+            This account is not on the admin list. Sign out and sign back in
+            with the email that is.
+          </p>
+          <button
+            type="button"
+            onClick={async () => {
+              await supabase.auth.signOut();
+              setUser(null);
+              setDenied(false);
+              setShowAuth(true);
+            }}
+            className="rounded-full bg-white/5 border border-white/10 text-[#F1FFFF] hover:bg-white/10 px-6 py-2.5 text-sm font-medium transition"
+          >
+            Sign out
+          </button>
+        </div>
       </div>
     );
   }
